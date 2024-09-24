@@ -38,8 +38,6 @@ resource "aws_lambda_function" "event_lambda" {
   runtime       = "python3.9"
   role          = aws_iam_role.lambda_role.arn
   source_code_hash = filebase64sha256("../lambda_functions.zip")  # Update for deployment
-
-  # Ensure the zip file is uploaded correctly (you may use a zip in actual deployment)
   filename = "../lambda_functions.zip"
 }
 
