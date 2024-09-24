@@ -78,3 +78,14 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
 }
+
+resource "aws_cloudwatch_log_group" "eventbridge_logs" {
+  name = "/aws/events/agrcic-s3-upload-event-rule"
+}
+
+resource "aws_cloudwatch_event_target" "log_target" {
+  rule      = aws_cloudwatch_event_rule.s3_event_rule.name
+  target_id = "log_target"
+  arn       = aws_cloudwatch_log_group.eventbridge_logs.arn
+}
+
