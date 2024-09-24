@@ -10,6 +10,14 @@ resource "aws_s3_bucket" "event_bucket" {
   force_destroy = true
 }
 
+# Create the S3 bucket notification configuration to send events to EventBridge
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.event_bucket.id
+  eventbridge_configuration {
+    eventbridge_enabled = true
+  }
+}
+
 # Create a Lambda execution role
 resource "aws_iam_role" "lambda_role" {
   name = "agrcic-role-eventbridge_lambda_role"
