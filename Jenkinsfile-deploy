@@ -7,16 +7,16 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                dir('/var/lib/jenkins/workspace/shared-agrcic-resources-3') {
-                    git branch: 'main', credentialsId: 'github-creds', url: 'https://github.com/muckalo/aws_sf_nested_1.git'
-//                    git branch: 'main', url: 'https://github.com/muckalo/aws_sf_nested_1.git'
+                dir('/var/lib/jenkins/workspace/shared-agrcic-resources-4') {
+                    git branch: 'main', credentialsId: 'github-creds', url: 'https://github.com/muckalo/aws_event_bridge_1.git'
+//                    git branch: 'main', url: 'https://github.com/muckalo/aws_event_bridge_1.git'
                 }
             }
         }
 
         stage('Prepare Lambda Deployment Package') {
             steps {
-                dir('/var/lib/jenkins/workspace/shared-agrcic-resources-3') {
+                dir('/var/lib/jenkins/workspace/shared-agrcic-resources-4') {
                     sh '''
                     cd lambda
                     zip -r ../lambda_functions.zip .
@@ -29,7 +29,7 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-3/terraform') {
+                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-4/terraform') {
                         sh 'terraform init'
                     }
                 }
@@ -39,7 +39,7 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-3/terraform') {
+                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-4/terraform') {
                         sh '''
                         terraform plan \
                         -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
@@ -55,7 +55,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-creds', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-3/terraform') {
+                    dir('/var/lib/jenkins/workspace/shared-agrcic-resources-4/terraform') {
                         sh '''
                         terraform apply -auto-approve \
                         -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
