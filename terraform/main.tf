@@ -10,13 +10,13 @@ resource "aws_s3_bucket" "event_bucket" {
   force_destroy = true
 }
 
-# Create the S3 bucket notification configuration to send events to EventBridge
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = aws_s3_bucket.event_bucket.id
-  eventbridge_configuration {
-    eventbridge_enabled = true
-  }
-}
+# # Create the S3 bucket notification configuration to send events to EventBridge
+# resource "aws_s3_bucket_notification" "bucket_notification" {
+#   bucket = aws_s3_bucket.event_bucket.id
+#   eventbridge_configuration {
+#     eventbridge_enabled = true
+#   }
+# }
 
 # Create a Lambda execution role
 resource "aws_iam_role" "lambda_role" {
@@ -81,3 +81,21 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
 }
+
+# Grant S3 permission to put events into EventBridge
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.event_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "events.amazonaws.com"
+      }
+      Action = "s3:PutObject"
+      Resource = "${aws_s3_bucket.event_bucket.arn}/*"
+    }]
+  })
+}
+
